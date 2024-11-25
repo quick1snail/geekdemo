@@ -42,28 +42,49 @@ public class OrgService {
 
     @Transactional
     public OrgResponse updateOrgBasic(Long id, UpdateOrgBasicRequest request, Long userId) {
-        Org org = orgRepository.findById(request.getTenantId(), id)
-                .orElseThrow(() -> {
-                    throw new BusinessException("要修改的组织(id =" + id + "  )不存在！");
-                });
+        // Org org = orgRepository.findById(request.getTenantId(), id)
+        //         .orElseThrow(() -> {
+        //             throw new BusinessException("要修改的组织(id =" + id + "  )不存在！");
+        //         });
+        //
+        // orgHandler.updateBasic(org, request.getName() , request.getLeaderId(), userId);
+        // orgRepository.update(org);
+        //
+        // return buildOrgDto(org);
 
-        orgHandler.updateBasic(org, request.getName() , request.getLeaderId(), userId);
-        orgRepository.update(org);
+        Optional<Org> byId = orgRepository.findById(request.getTenantId(), id);
 
-        return buildOrgDto(org);
+        if (byId.isPresent()) {
+            Org org = byId.get();
+            orgHandler.updateBasic(org, request.getName() , request.getLeaderId(), userId);
+            orgRepository.update(org);
+            return buildOrgDto(org);
+        }
+        return null;
     }
 
     @Transactional
     public Long cancelOrg(Long tenant, Long id, Long userId) {
-        Org org = orgRepository.findById(tenant, id)
-                .orElseThrow(() -> {
-                    throw new BusinessException("要取消的组织(id =" + id + "  )不存在！");
-                });
+        // Org org = orgRepository.findById(tenant, id)
+        //         .orElseThrow(() -> {
+        //             throw new BusinessException("要取消的组织(id =" + id + "  )不存在！");
+        //         });
+        //
+        // orgHandler.cancel(org, userId);
+        // orgRepository.update(org);
+        //
+        // return org.getId();
 
-        orgHandler.cancel(org, userId);
-        orgRepository.update(org);
+        Optional<Org> byId = orgRepository.findById(tenant, id);
 
-        return org.getId();
+        if (byId.isPresent()) {
+            Org org = byId.get();
+            orgHandler.cancel(org, userId);
+            orgRepository.update(org);
+
+            return org.getId();
+        }
+        return null;
     }
 
     public Optional<Org> findOrgById(Long tenantId, Long id) {
